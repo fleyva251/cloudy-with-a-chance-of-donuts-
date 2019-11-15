@@ -2,9 +2,29 @@
 const express = require('express');
 const app = express();
 const port = 3000;
+const mysql = require('mysql');
+
+//connect to database using mysqljs
+const connection = mysql.createConnection({
+  host: "localhost",
+  user: "root",
+  password: "password",
+  database: 'mcsp02donuts'
+});
+
+connection.connect(function(err) {
+    if (err) throw err;
+    console.log("Connected!");
+  });
 
 // routes 
-app.get('/', (req, res) => res.send('Hello World!'));
+app.get('/', (req, res) => {
+    res.send('Hello World!')
+    //use mysqljs to run SQL queries to get data
+    //res.send that data
+});
+
+
 
 //donut routes
 
@@ -18,7 +38,14 @@ app.post('/donuts', (req, res) => {
 
 //Get all donuts
 app.get('/donuts', (req, res) => {
-    res.send('Sorry no donuts yet');
+    connection.query('SELECT * FROM donuts', function (error, results, fields) {
+        if (error) {
+            res.send('Something Went Wrong')
+        }
+        console.log('The solution is: ', results);
+        res.send(results);
+      });
+
 })
 //get a single donut
 app.get('/donuts/:id', (req, res) => {
